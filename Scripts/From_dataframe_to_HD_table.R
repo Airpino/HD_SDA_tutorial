@@ -17,10 +17,10 @@ from_DFg_to_MH<-function(DFg,labs_rows,typeH="base",br=20){
                       varnames = name_cols)
   for (i in 1:rows){
     name_rows<-c(name_rows,
-                 as.character((DFg[[i]] %>% select(labs_rows) %>% 
+                 as.character((DFg[[i]] %>% dplyr::select(labs_rows) %>% 
                                  unique() %>% pull()))[1])
     for (j in 1:length(name_cols)){
-      h<-hist(DFg[[i]] %>% select(name_cols[j]) %>% pull())
+      h<-hist(DFg[[i]] %>% dplyr::select(name_cols[j]) %>% pull())
       x<-h$breaks
       cdf<-cumsum(c(0,h$counts))/sum(h$counts)
       tmp<-HistDAWass::distributionH(x=x,p=cdf)
@@ -31,6 +31,6 @@ from_DFg_to_MH<-function(DFg,labs_rows,typeH="base",br=20){
   return(M)
 }
 
-tmp2<-diamonds %>% group_by(color) %>% group_split()
-tmp3<-from_DFg_to_MH(tmp2,br=8,labs_rows = "color")
-plot(tmp3,type="DENS")
+ tmp2<-diamonds %>% group_by(color) %>% group_split()
+ tmp3<-from_DFg_to_MH(tmp2,br=8,labs_rows = "color")
+show(plot(tmp3,type="DENS"))
