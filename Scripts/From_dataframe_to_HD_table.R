@@ -1,13 +1,11 @@
 library(HistDAWass)
 library(tidyverse)
-# from_json_to_HD<-function(a,file="tmp.json"){
-#   return 0
-# }
-# from_HD_to_json<-function(file="tmp.json",MH){
-#   return 0
-# }
 
-from_DFg_to_MH<-function(DFg,labs_rows,typeH="base",br=20){
+
+from_DFg_to_MH<-function(DFg, # a grouped data.frame or tibble
+                         labs_rows, #the name of the variables that defines groups
+                         typeH="base",# this will be used when several histogram estimation methods will be available
+                         br=20){
   require(tidyverse)
   rows<-length(DFg)
   name_rows<-character()
@@ -20,7 +18,7 @@ from_DFg_to_MH<-function(DFg,labs_rows,typeH="base",br=20){
                  as.character((DFg[[i]] %>% dplyr::select(labs_rows) %>% 
                                  unique() %>% pull()))[1])
     for (j in 1:length(name_cols)){
-      h<-hist(DFg[[i]] %>% dplyr::select(name_cols[j]) %>% pull())
+      h<-hist(DFg[[i]] %>% dplyr::select(name_cols[j]) %>% pull(),plot=FALSE)
       x<-h$breaks
       cdf<-cumsum(c(0,h$counts))/sum(h$counts)
       tmp<-HistDAWass::distributionH(x=x,p=cdf)
@@ -31,6 +29,15 @@ from_DFg_to_MH<-function(DFg,labs_rows,typeH="base",br=20){
   return(M)
 }
 
- tmp2<-diamonds %>% group_by(color) %>% group_split()
- tmp3<-from_DFg_to_MH(tmp2,br=8,labs_rows = "color")
-show(plot(tmp3,type="DENS"))
+tmp2<-diamonds %>% group_by(color) %>% group_split()
+tmp3<-from_DFg_to_MH(tmp2,br=8,labs_rows = "color")
+p1<-plot(tmp3,type="DENS")
+show(p1)
+
+## Mix cut and color
+
+tmp5<-diamonds %>% mutate(GR=paste0(cut,color,sep="_")) %>% 
+  group_by(GR) %>% group_split()
+tmp6<-from_DFg_to_MH(tmp5,br=8,labs_rows = "GR")
+p2<-plot(tmp6,type="DENS")
+show(p2)
